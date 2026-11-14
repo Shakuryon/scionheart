@@ -1,0 +1,81 @@
+/* ==========================================================
+   CYAN HEART — media.css (responsive + motion preferences)
+   ========================================================== */
+
+@media (max-width: 1000px) {
+  .top__nav { display: none; }
+}
+
+@media (max-width: 860px) {
+  .split, .split--rev { flex-direction: column; align-items: stretch; }
+  .split > * { flex: 1 1 auto; }
+  .hue { flex-direction: column; }
+  .hue__arrow { flex: 0 0 auto; justify-content: center; height: 3rem; }
+  .hue__arrow span { width: 2px; height: 100%; background: linear-gradient(180deg, var(--magenta), var(--cyan)); transform: scaleY(0); transform-origin: top; }
+  .hue.is-in .hue__arrow span { transform: scaleY(1); }
+  .hue__col--after { transform: translateY(-16px); }
+  .shot--offset { width: 85%; margin-top: -1.5rem; }
+  .hero__media::after { background: linear-gradient(to top, var(--bg) 0%, rgba(3, 9, 11, 0.78) 45%, rgba(3, 9, 11, 0.6) 100%); }
+  .hero__pause { bottom: auto; top: 5rem; }
+}
+
+@media (max-width: 600px) {
+  body { font-size: 1rem; }
+  .hud { inset: 0.4rem; }
+  .hud .bracket { width: 1.3rem; height: 1.3rem; }
+  .hud__time { font-size: 0.7rem; bottom: 0.3rem; left: 0.5rem; }
+  .top { padding: 0.7rem 1rem; }
+  .top__logo span { display: none; }
+  .top .btn--sm { padding: 0.4rem 0.65rem; font-size: 0.78rem; }
+  .hero { padding-top: 5.5rem; padding-bottom: 6rem; }
+  .hero__cta { flex-direction: column; align-items: stretch; width: 100%; }
+  .hero__cta .btn { width: 100%; }
+  .chips { flex-direction: column; }
+  .gate__choices { flex-direction: column; width: 100%; }
+  .gate__btn { width: 100%; }
+  .boot__body { flex-direction: column; padding: 1rem; }
+  .emblem--boot { width: 1.8rem; height: 5.4rem; }
+  .boot__panel { width: 100%; }
+  .boot__log { font-size: 0.85rem; min-height: 12rem; }
+  .frames li { flex-basis: calc(50% - 1rem); min-width: 140px; }
+  .kv > div { flex-direction: column; gap: 0.1rem; }
+  .kv dt { flex-basis: auto; }
+  .panel__list li { flex-direction: column; gap: 0.1rem; }
+  .panel__k { flex-basis: auto; }
+  .lightbox__bar { flex-wrap: wrap; }
+}
+
+/* ---------- Reduced motion: keep the look, drop the movement ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+  }
+  .fx--grain { animation: none; }
+  .glitch::before, .glitch::after { display: none; }
+  .rec-dot { animation: none; opacity: 1; }
+  .hero__poster { animation: none; }
+  .js .reveal { opacity: 1; transform: none; }
+  .hue__col--after { opacity: 1; transform: none; filter: none; }
+  .boot .bracket { width: 3.5rem; height: 3.5rem; opacity: 0.9; }
+  .boot.is-out { animation: none; opacity: 0; }
+}
+
+/* ---------- More contrast when the user asks for it ---------- */
+@media (prefers-contrast: more) {
+  :root { --muted: #c4dedb; --line: rgba(53, 240, 224, 0.6); }
+  .fx { display: none; }
+}
+
+@media print {
+  .gate, .boot, .hud, .fx, .top { display: none !important; }
+  body { background: #fff; color: #000; }
+}
+
+/* Short or narrow screens: the scroll cue would collide with hero content */
+@media (max-height: 860px), (max-width: 600px) {
+  .hero__scroll { display: none; }
+}
