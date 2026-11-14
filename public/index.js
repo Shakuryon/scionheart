@@ -2,7 +2,7 @@
    CYAN HEART — index.js
    1. Language gate  2. Camera-boot preloader  3. i18n
    4. HUD clock / header  5. Scroll reveal  6. Video fallbacks
-   7. Gallery lightbox
+   7. Gallery lightbox  8. Background music toggle
    ========================================================== */
 (function () {
   "use strict";
@@ -88,6 +88,7 @@
       ? "Cyan Heart | 「自撮り視点」サイコロジカルホラー探索アドベンチャー"
       : "Cyan Heart | Selfie-Perspective Psychological Horror Adventure on Steam";
     syncPauseLabel();
+    syncMusic();
     try { localStorage.setItem("ch-lang", currentLang); } catch (e) { /* storage unavailable */ }
   }
   doc.querySelectorAll(".lang__btn").forEach(function (b) {
@@ -105,6 +106,8 @@
   gateBtns.forEach(function (b) {
     b.addEventListener("click", function () {
       setLang(b.dataset.lang);
+      // The click is the user gesture browsers require before audio may play
+      if (musicWanted) startMusic();
       gate.classList.add("is-gone");
       runBoot();
     });
@@ -291,4 +294,59 @@
     if (e.key === "ArrowRight") showFrame(lbIndex + 1);
   });
   lb.addEventListener("close", function () { frames[lbIndex].focus(); });
+
+  /* ---------- 8. Background music: main theme, floating on/off toggle ---------- */
+  var bgm = doc.getElementById("bgm");
+  var musicBtn = doc.getElementById("music");
+  var musicLabel = doc.getElementById("music-label");
+  var MUSIC_VOLUME = 0.45;
+  var musicWanted = true;      // visitor's choice; remembered between visits
+  var heldBy = null;           // "trailer" or "tab" while music is paused on the visitor's behalf
+  var fadeTimer = null;
+  try { musicWanted = localStorage.getItem("ch-music") !== "off"; } catch (e) { /* ignore */ }
+
+  function syncMusic() {
+    if (!musicBtn) return;
+    var on = !bgm.paused;
+    musicBtn.classList.toggle("is-on", on);
+    musicBtn.setAttribute("aria-pressed", String(on));
+    musicLabel.textContent = currentLang === "ja"
+      ? (on ? "音楽：オン" : "音楽：オフ")
+      : (on ? "Music: On" : "Music: Off");
+  }
+  function fadeIn() {
+    clearInterval(fadeTimer);
+    if (reduceMotion) { bgm.volume = MUSIC_VOLUME; return; }
+    fadeTimer = setInterval(function () {
+      bgm.volume = Math.min(MUSIC_VOLUME, bgm.volume + 0.03);
+      if (bgm.volume >= MUSIC_VOLUME) clearInterval(fadeTimer);
+    }, 120);
+  }
+  function startMusic() {
+    bgm.volume = 0;
+    var p = bgm.play();
+    if (p && p.then) p.then(fadeIn).catch(syncMusic); else fadeIn();
+  }
+  function saveMusic(value) {
+    try { localStorage.setItem("ch-music", value); } catch (e) { /* ignore */ }
+  }
+  musicBtn.addEventListener("click", function () {
+    heldBy = null;
+    if (bgm.paused) { musicWanted = true; saveMusic("on"); startMusic(); }
+    else { musicWanted = false; saveMusic("off"); bgm.pause(); }
+  });
+  bgm.addEventListener("play", syncMusic);
+  bgm.addEventListener("pause", syncMusic);
+  bgm.addEventListener("error", function () { musicBtn.hidden = true; });
+
+  // Step aside for the trailer's own audio, and when the tab is in the background
+  function hold(reason) { if (!bgm.paused) { heldBy = reason; bgm.pause(); } }
+  function release(reason) { if (heldBy === reason && musicWanted) { heldBy = null; startMusic(); } }
+  trailer.addEventListener("play", function () { hold("trailer"); });
+  trailer.addEventListener("pause", function () { release("trailer"); });
+  trailer.addEventListener("ended", function () { release("trailer"); });
+  doc.addEventListener("visibilitychange", function () {
+    if (doc.hidden) hold("tab"); else release("tab");
+  });
+  syncMusic();
 })();

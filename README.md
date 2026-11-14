@@ -31,6 +31,12 @@ section shows a card linking to Steam.
 Screenshots currently load from Steam's public CDN. For production, save them into `public/assets/`
 and update the `src` / `data-full` paths in `index.html`.
 
+## Background music
+
+`public/assets/Cyan Heart OST - MainTheme.mp3` loops quietly once the visitor picks a language (browsers
+only allow audio after a click). A floating Music On/Off button sits bottom-right; the choice is remembered,
+and the music pauses while the trailer plays or the tab is in the background.
+
 ## Accessibility
 
 - All motion is disabled under `prefers-reduced-motion`; no rapid flashing.
